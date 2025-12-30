@@ -19,40 +19,9 @@ Route::get('/login', function () {
 })->name('login');
 
 // Route untuk PDF Laporan Mutasi Kas - Langsung generate PDF
-Route::get('/laporan/mutasi-kas/pdf', function () {
-    $jenisKas = request('jenis_kas', 'KAS');
-    $periode = request('periode', date('d-M-y'));
-    $dari = request('dari', '');
-    $sampai = request('sampai', '');
-    $data = json_decode(base64_decode(request('data', '')), true) ?? [];
-    
-    if (empty($data)) {
-        abort(404, 'Data tidak ditemukan');
-    }
-    
-    // Format periode yang lebih lengkap
-    $periodeText = "Periode {$dari} sampai {$sampai}";
-    
-    // Generate PDF langsung
-    $pdf = Pdf::loadView('pdf.laporan-mutasi-kas-compact', compact('jenisKas', 'periodeText', 'data'));
-    
-    // Set paper size dan orientation
-    $pdf->setPaper('A4', 'landscape');
-    
-    // Set options untuk kualitas yang lebih baik
-    $pdf->setOptions([
-        'isHtml5ParserEnabled' => true,
-        'isPhpEnabled' => true,
-        'defaultFont' => 'Arial'
-    ]);
-    
-    // Generate filename
-    $filename = "Laporan_Mutasi_Kas_{$jenisKas}_Periode_" . str_replace([' ', '/'], '_', $periode) . ".pdf";
-    
-    // Stream PDF ke browser (langsung preview)
-    return $pdf->stream($filename);
-    
-})->name('laporan.mutasi.kas.pdf')->middleware('auth');
+Route::get('/laporan/mutasi-kas/pdf', [App\Http\Controllers\LaporanMutasiKasPdfController::class, 'generatePdf'])
+    ->name('laporan.mutasi.kas.pdf')
+    ->middleware('auth');
 
 // Route untuk export proyeksi individual
 Route::get('/proyeksi/export/{id}', [App\Http\Controllers\ProyeksiExportController::class, 'export'])

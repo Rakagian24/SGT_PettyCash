@@ -464,6 +464,9 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
         }
 
         try {
+            // Clean up old session data first
+            $this->cleanupOldPdfSessions();
+            
             $jenisKas = 'KAS';
             $dari = '';
             $sampai = '';
@@ -484,16 +487,46 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
                 }
             }
             
-            // Return URL untuk preview PDF
+            // Generate unique session key
+            $sessionKey = 'laporan_mutasi_kas_' . uniqid();
+            
+            // Store data in session instead of URL
+            session([
+                $sessionKey => [
+                    'data' => $this->cachedResults->toArray(),
+                    'jenis_kas' => $jenisKas,
+                    'dari' => $dari,
+                    'sampai' => $sampai,
+                    'expires_at' => now()->addMinutes(10) // Expire after 10 minutes
+                ]
+            ]);
+            
+            // Return URL dengan session key saja
             return route('laporan.mutasi.kas.pdf', [
-                'jenis_kas' => $jenisKas,
-                'dari' => $dari,
-                'sampai' => $sampai,
-                'data' => base64_encode(json_encode($this->cachedResults->toArray()))
+                'session_key' => $sessionKey
             ]);
             
         } catch (\Exception $e) {
             return null;
+        }
+    }
+
+    /**
+     * Clean up old PDF session data to prevent session bloat
+     */
+    private function cleanupOldPdfSessions()
+    {
+        $allSessionData = session()->all();
+        $now = now();
+        
+        foreach ($allSessionData as $key => $value) {
+            // Check if this is a PDF session key and if it's expired
+            if (str_starts_with($key, 'laporan_mutasi_kas_') && 
+                is_array($value) && 
+                isset($value['expires_at']) && 
+                $now->gt($value['expires_at'])) {
+                session()->forget($key);
+            }
         }
     }
 
