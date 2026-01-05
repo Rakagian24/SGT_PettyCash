@@ -25,9 +25,9 @@ class TransaksiKmForm
                     ->label('Jenis Kas')
                     ->options([
                         1 => 'Kas Kecil (KGS)',
-                        2 => 'Operasional (OGS)',
-                        3 => 'Proyek (PGS)',
-                        4 => 'Bank (BGS)',
+                        2 => 'Kas Operasional (OGS)',
+                        3 => 'Kas Personalia (PGS)',
+                        4 => 'Kas Bangunan (BGS)',
                     ])
                     ->required()
                     ->searchable()
