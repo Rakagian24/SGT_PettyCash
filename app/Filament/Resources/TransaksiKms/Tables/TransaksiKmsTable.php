@@ -17,14 +17,20 @@ class TransaksiKmsTable
     {
         return $table
             ->columns([
+                TextColumn::make('no_km')
+                    ->label('No. Transaksi')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold')
+                    ->copyable()
+                    ->copyMessage('Nomor transaksi disalin!')
+                    ->copyMessageDuration(1500),
                 TextColumn::make('tanggal_km')
                     ->date()
                     ->sortable(),
                 TextColumn::make('jenisKas.jenis_kas')
                     ->label('Jenis Kas')
                     ->sortable(),
-                TextColumn::make('no_km')
-                    ->searchable(),
                 TextColumn::make('masterTerima.jenis_terima')
                     ->label('Terima Dari')
                     ->sortable(),
@@ -67,9 +73,9 @@ class TransaksiKmsTable
                     ->label('Jenis Kas')
                     ->options([
                         1 => 'Kas Kecil (KGS)',
-                        2 => 'Operasional (OGS)',
-                        3 => 'Proyek (PGS)',
-                        4 => 'Bank (BGS)',
+                        2 => 'Kas Office (OGS)',
+                        3 => 'Kas Personalia (PGS)',
+                        4 => 'Kas Bangunan (BGS)',
                     ]),
             ])
             ->defaultSort('tanggal_km', 'desc')

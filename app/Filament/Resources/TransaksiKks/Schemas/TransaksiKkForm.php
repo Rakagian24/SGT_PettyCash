@@ -19,7 +19,31 @@ class TransaksiKkForm
                 DatePicker::make('tanggal_kk')
                     ->label('Tanggal')
                     ->required()
-                    ->default(now()),
+                    ->default(now())
+                    ->live()
+                    ->afterStateUpdated(function ($state, callable $set, callable $get, $record) {
+                        $jenisKas = $get('id_jenis_kas');
+                        if ($jenisKas && $state) {
+                            // For create mode
+                            if (!$record) {
+                                $nextNumber = \App\Models\TransaksiKk::getNextTransactionNumber($jenisKas, $state);
+                                $set('_next_no_kk', $nextNumber);
+                            }
+                            
+                            // For edit mode - update preview
+                            if ($record) {
+                                $originalPeriod = \Carbon\Carbon::parse($record->tanggal_kk)->format('ym');
+                                $newPeriod = \Carbon\Carbon::parse($state)->format('ym');
+                                
+                                if ($originalPeriod !== $newPeriod || $record->id_jenis_kas !== $jenisKas) {
+                                    $previewNumber = \App\Models\TransaksiKk::getPreviewNumberForEdit($jenisKas, $state, $record->idx);
+                                    $set('_preview_no_kk', $previewNumber);
+                                } else {
+                                    $set('_preview_no_kk', 'Tidak berubah');
+                                }
+                            }
+                        }
+                    }),
 
                 Select::make('id_jenis_kas')
                     ->label('Jenis Kas')
@@ -31,14 +55,88 @@ class TransaksiKkForm
                     ])
                     ->required()
                     ->searchable()
-                    ->native(false),
+                    ->native(false)
+                    ->live()
+                    ->afterStateUpdated(function ($state, callable $set, callable $get, $record) {
+                        if ($state) {
+                            // For create mode
+                            if (!$record) {
+                                $nextNumber = \App\Models\TransaksiKk::getNextTransactionNumber($state, $get('tanggal_kk'));
+                                $set('_next_no_kk', $nextNumber);
+                            }
+                            
+                            // For edit mode - update preview
+                            if ($record) {
+                                $newDate = $get('tanggal_kk');
+                                if ($newDate) {
+                                    $originalPeriod = \Carbon\Carbon::parse($record->tanggal_kk)->format('ym');
+                                    $newPeriod = \Carbon\Carbon::parse($newDate)->format('ym');
+                                    
+                                    if ($originalPeriod !== $newPeriod || $record->id_jenis_kas !== $state) {
+                                        $previewNumber = \App\Models\TransaksiKk::getPreviewNumberForEdit($state, $newDate, $record->idx);
+                                        $set('_preview_no_kk', $previewNumber);
+                                    } else {
+                                        $set('_preview_no_kk', 'Tidak berubah');
+                                    }
+                                }
+                            }
+                        } else {
+                            $set('_next_no_kk', null);
+                            $set('_preview_no_kk', null);
+                        }
+                    }),
 
                 TextInput::make('no_kk')
                     ->label('No. Kas Keluar')
                     ->disabled()
                     ->dehydrated(false)
                     ->hidden(fn ($context) => $context === 'create')
-                    ->helperText('Nomor akan di-generate otomatis'),
+                    ->helperText(fn ($context) => $context === 'edit' 
+                        ? 'Nomor akan berubah jika tanggal dipindah ke bulan/tahun yang berbeda' 
+                        : 'Nomor akan di-generate otomatis'),
+
+                // Preview nomor transaksi baru saat edit
+                TextInput::make('_preview_no_kk')
+                    ->label('Preview Nomor Baru')
+                    ->disabled()
+                    ->dehydrated(false)
+                    ->visible(fn ($context) => $context === 'edit')
+                    ->live()
+                    ->afterStateHydrated(function ($state, callable $set, callable $get, $record) {
+                        if ($record) {
+                            $newDate = $get('tanggal_kk');
+                            $newJenisKas = $get('id_jenis_kas');
+                            
+                            if ($newDate && $newJenisKas) {
+                                $originalPeriod = \Carbon\Carbon::parse($record->tanggal_kk)->format('ym');
+                                $newPeriod = \Carbon\Carbon::parse($newDate)->format('ym');
+                                
+                                if ($originalPeriod !== $newPeriod || $record->id_jenis_kas !== $newJenisKas) {
+                                    $previewNumber = \App\Models\TransaksiKk::getPreviewNumberForEdit($newJenisKas, $newDate, $record->idx);
+                                    $set('_preview_no_kk', $previewNumber);
+                                } else {
+                                    $set('_preview_no_kk', 'Tidak berubah');
+                                }
+                            }
+                        }
+                    })
+                    ->helperText('Nomor ini akan digunakan jika periode atau jenis kas berubah'),
+
+                // Display next transaction number for user reference
+                TextInput::make('_next_no_kk')
+                    ->label('Nomor Transaksi Berikutnya')
+                    ->disabled()
+                    ->dehydrated(false)
+                    ->visible(fn ($context) => $context === 'create')
+                    ->live()
+                    ->afterStateHydrated(function ($state, callable $set, callable $get) {
+                        $jenisKas = $get('id_jenis_kas');
+                        if ($jenisKas) {
+                            $nextNumber = \App\Models\TransaksiKk::getNextTransactionNumber($jenisKas);
+                            $set('_next_no_kk', $nextNumber);
+                        }
+                    })
+                    ->helperText('Nomor ini akan digunakan untuk transaksi yang akan dibuat'),
 
                 Select::make('id_bayar')
                     ->label('Dibayar Kepada')

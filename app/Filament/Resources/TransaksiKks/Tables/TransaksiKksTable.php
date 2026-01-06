@@ -17,14 +17,20 @@ class TransaksiKksTable
     {
         return $table
             ->columns([
+                TextColumn::make('no_kk')
+                    ->label('No. Transaksi')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold')
+                    ->copyable()
+                    ->copyMessage('Nomor transaksi disalin!')
+                    ->copyMessageDuration(1500),
                 TextColumn::make('tanggal_kk')
                     ->date()
                     ->sortable(),
                 TextColumn::make('jenisKas.jenis_kas')
                     ->label('Jenis Kas')
                     ->sortable(),
-                TextColumn::make('no_kk')
-                    ->searchable(),
                 TextColumn::make('masterBayar.jenis_bayar')
                     ->label('Bayar Ke')
                     ->sortable(),
@@ -70,9 +76,9 @@ class TransaksiKksTable
                     ->label('Jenis Kas')
                     ->options([
                         1 => 'Kas Kecil (KGS)',
-                        2 => 'Operasional (OGS)',
-                        3 => 'Proyek (PGS)',
-                        4 => 'Bank (BGS)',
+                        2 => 'Kas Office (OGS)',
+                        3 => 'Kas Personalia (PGS)',
+                        4 => 'Kas Bangunan (BGS)',
                     ]),
             ])
             ->defaultSort('tanggal_kk', 'desc')
