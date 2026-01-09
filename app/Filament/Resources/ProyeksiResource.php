@@ -83,10 +83,27 @@ class ProyeksiResource extends Resource
 
                 TextInput::make('kisaran_sawal')
                     ->label('Kisaran Saldo Awal')
-                    ->numeric()
                     ->required()
                     ->default(0)
-                    ->prefix('Rp'),
+                    ->prefix('Rp')
+                    ->placeholder('Contoh: 25000.65')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if ($state && $state !== '') {
+                            $cleanValue = str_replace(',', '', $state);
+                            if (is_numeric($cleanValue)) {
+                                $numericValue = (float) $cleanValue;
+                                $formatted = number_format($numericValue, 2, '.', ',');
+                                $set('kisaran_sawal', $formatted);
+                            }
+                        }
+                    })
+                    ->dehydrateStateUsing(function ($state) {
+                        return $state ? (float) str_replace(',', '', $state) : null;
+                    })
+                    ->formatStateUsing(function ($state) {
+                        return $state ? number_format((float) $state, 2, '.', ',') : '';
+                    }),
 
                 Repeater::make('details')
                     ->label('Detail Proyeksi')
@@ -108,9 +125,26 @@ class ProyeksiResource extends Resource
 
                         TextInput::make('nominal_proyeksi')
                             ->label('Nominal Proyeksi')
-                            ->numeric()
                             ->required()
-                            ->prefix('Rp'),
+                            ->prefix('Rp')
+                            ->placeholder('Contoh: 25000.65')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if ($state && $state !== '') {
+                                    $cleanValue = str_replace(',', '', $state);
+                                    if (is_numeric($cleanValue)) {
+                                        $numericValue = (float) $cleanValue;
+                                        $formatted = number_format($numericValue, 2, '.', ',');
+                                        $set('nominal_proyeksi', $formatted);
+                                    }
+                                }
+                            })
+                            ->dehydrateStateUsing(function ($state) {
+                                return $state ? (float) str_replace(',', '', $state) : null;
+                            })
+                            ->formatStateUsing(function ($state) {
+                                return $state ? number_format((float) $state, 2, '.', ',') : '';
+                            }),
                     ])
                     ->columns(2)
                     ->minItems(1)

@@ -153,9 +153,29 @@ class TransaksiKmForm
 
                 TextInput::make('nominal_km')
                     ->label('Nominal')
-                    ->numeric()
                     ->prefix('Rp')
-                    ->required(),
+                    ->required()
+                    ->placeholder('Contoh: 25000.65')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if ($state && $state !== '') {
+                            // Remove any existing commas first
+                            $cleanValue = str_replace(',', '', $state);
+                            
+                            // Check if it's a valid number
+                            if (is_numeric($cleanValue)) {
+                                $numericValue = (float) $cleanValue;
+                                $formatted = number_format($numericValue, 2, '.', ',');
+                                $set('nominal_km', $formatted);
+                            }
+                        }
+                    })
+                    ->dehydrateStateUsing(function ($state) {
+                        return $state ? (float) str_replace(',', '', $state) : null;
+                    })
+                    ->formatStateUsing(function ($state) {
+                        return $state ? number_format((float) $state, 2, '.', ',') : '';
+                    }),
 
                 Select::make('id_klasifikasi')
                     ->label('Klasifikasi')

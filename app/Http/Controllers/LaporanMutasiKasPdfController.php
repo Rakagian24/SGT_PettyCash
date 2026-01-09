@@ -44,7 +44,7 @@ class LaporanMutasiKasPdfController extends Controller
             $pdf = Pdf::loadView('pdf.laporan-mutasi-kas-compact', compact('jenisKas', 'periodeText', 'data'));
             
             // Set paper size dan orientation
-            $pdf->setPaper('A4', 'landscape');
+            $pdf->setPaper('A4', 'portrait');
             
             // Set options untuk kualitas yang lebih baik
             $pdf->setOptions([

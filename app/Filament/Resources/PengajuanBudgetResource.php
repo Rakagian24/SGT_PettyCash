@@ -93,16 +93,26 @@ class PengajuanBudgetResource extends Resource
 
                 TextInput::make('kisaran_saldo')
                     ->label('Kisaran Sisa Saldo')
-                    ->numeric()
                     ->required()
                     ->default(0)
                     ->prefix('Rp')
+                    ->placeholder('Contoh: 25000.65')
                     ->live(onBlur: true)
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        if ($state && $state !== '') {
+                            // Format the current field
+                            $cleanValue = str_replace(',', '', $state);
+                            if (is_numeric($cleanValue)) {
+                                $numericValue = (float) $cleanValue;
+                                $formatted = number_format($numericValue, 2, '.', ',');
+                                $set('kisaran_saldo', $formatted);
+                            }
+                        }
+                        
                         // Auto calculate nominal_pengajuan when kisaran_saldo changes
                         $details = $get('details') ?? [];
                         $totalDetail = collect($details)->sum('nominal_pengajuan_dtl');
-                        $kisaranSaldo = floatval($state ?? 0);
+                        $kisaranSaldo = floatval(str_replace(',', '', $state ?? 0));
                         
                         if ($totalDetail >= $kisaranSaldo) {
                             $pengajuan = $totalDetail - $kisaranSaldo;
@@ -110,15 +120,24 @@ class PengajuanBudgetResource extends Resource
                             $pengajuan = $totalDetail;
                         }
                         
-                        $set('nominal_pengajuan', $pengajuan);
+                        $formattedPengajuan = number_format($pengajuan, 2, '.', ',');
+                        $set('nominal_pengajuan', $formattedPengajuan);
+                    })
+                    ->dehydrateStateUsing(function ($state) {
+                        return $state ? (float) str_replace(',', '', $state) : null;
+                    })
+                    ->formatStateUsing(function ($state) {
+                        return $state ? number_format((float) $state, 2, '.', ',') : '';
                     }),
 
                 TextInput::make('nominal_pengajuan')
                     ->label('Nominal Pengajuan')
-                    ->numeric()
                     ->prefix('Rp')
                     ->disabled()
-                    ->dehydrated(),
+                    ->dehydrated()
+                    ->formatStateUsing(function ($state) {
+                        return $state ? number_format((float) $state, 2, '.', ',') : '';
+                    }),
 
                 Repeater::make('details')
                     ->label('Detail Pengajuan Budget')
@@ -155,15 +174,27 @@ class PengajuanBudgetResource extends Resource
 
                         TextInput::make('nominal_pengajuan_dtl')
                             ->label('Nominal')
-                            ->numeric()
                             ->required()
                             ->prefix('Rp')
+                            ->placeholder('Contoh: 25000.65')
                             ->live(onBlur: true)
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                if ($state && $state !== '') {
+                                    // Format the current field
+                                    $cleanValue = str_replace(',', '', $state);
+                                    if (is_numeric($cleanValue)) {
+                                        $numericValue = (float) $cleanValue;
+                                        $formatted = number_format($numericValue, 2, '.', ',');
+                                        $set('nominal_pengajuan_dtl', $formatted);
+                                    }
+                                }
+                                
                                 // Auto calculate total when detail nominal changes
                                 $details = $get('../../details') ?? [];
-                                $totalDetail = collect($details)->sum('nominal_pengajuan_dtl');
-                                $kisaranSaldo = floatval($get('../../kisaran_saldo') ?? 0);
+                                $totalDetail = collect($details)->sum(function($detail) {
+                                    return (float) str_replace(',', '', $detail['nominal_pengajuan_dtl'] ?? 0);
+                                });
+                                $kisaranSaldo = floatval(str_replace(',', '', $get('../../kisaran_saldo') ?? 0));
                                 
                                 if ($totalDetail >= $kisaranSaldo) {
                                     $pengajuan = $totalDetail - $kisaranSaldo;
@@ -171,7 +202,14 @@ class PengajuanBudgetResource extends Resource
                                     $pengajuan = $totalDetail;
                                 }
                                 
-                                $set('../../nominal_pengajuan', $pengajuan);
+                                $formattedPengajuan = number_format($pengajuan, 2, '.', ',');
+                                $set('../../nominal_pengajuan', $formattedPengajuan);
+                            })
+                            ->dehydrateStateUsing(function ($state) {
+                                return $state ? (float) str_replace(',', '', $state) : null;
+                            })
+                            ->formatStateUsing(function ($state) {
+                                return $state ? number_format((float) $state, 2, '.', ',') : '';
                             }),
                     ])
                     ->columns(2)

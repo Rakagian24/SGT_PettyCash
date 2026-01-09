@@ -13,49 +13,52 @@
         body {
             font-family: Arial, sans-serif;
             font-size: 10px;
-            line-height: 1.2;
+            line-height: 1.3;
             color: #000;
             padding: 15px;
         }
         
         .header {
             text-align: left;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .header h1 {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
         
         .header h2 {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
             border: 1px solid #000;
-            padding: 4px 8px;
+            padding: 5px 8px;
             display: inline-block;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 9px;
+            table-layout: fixed;
         }
         
         th, td {
             border: 1px solid #000;
-            padding: 4px 6px;
+            padding: 4px 5px;
             text-align: left;
             vertical-align: top;
+            word-wrap: break-word;
+            overflow: hidden;
         }
         
         th {
             background-color: #f5f5f5;
             font-weight: bold;
             text-align: center;
-            font-size: 8px;
+            font-size: 9px;
         }
         
         .text-center {
@@ -78,27 +81,25 @@
         }
         
         .keterangan {
-            max-width: 120px;
+            max-width: 180px;
             word-wrap: break-word;
             font-size: 8px;
             line-height: 1.3;
+            overflow: hidden;
         }
         
         .no-wrap {
             white-space: nowrap;
         }
         
-        /* Kolom width */
-        .col-tanggal { width: 65px; }
-        .col-nomor { width: 75px; }
-        .col-dari { width: 85px; }
-        .col-keterangan { width: 130px; }
-        .col-id { width: 30px; }
-        .col-kriteria { width: 75px; }
-        .col-klasifikasi { width: 85px; }
-        .col-km { width: 70px; }
-        .col-kk { width: 70px; }
-        .col-saldo { width: 75px; }
+        /* Kolom width untuk portrait - disesuaikan agar pas A4 */
+        .col-tanggal { width: 70px; }
+        .col-nomor { width: 85px; }
+        .col-dari { width: 80px; }
+        .col-keterangan { width: 180px; }
+        .col-km { width: 75px; }
+        .col-kk { width: 75px; }
+        .col-saldo { width: 85px; }
     </style>
 </head>
 <body>
@@ -114,9 +115,6 @@
                 <th class="col-nomor">NOMOR<br>KM/KK</th>
                 <th class="col-dari">DARI/KE</th>
                 <th class="col-keterangan">KETERANGAN</th>
-                <th class="col-id">ID</th>
-                <th class="col-kriteria">KRITERIA</th>
-                <th class="col-klasifikasi">KLASIFIKASI</th>
                 <th class="col-km">KM</th>
                 <th class="col-kk">KK</th>
                 <th class="col-saldo">SALDO</th>
@@ -157,9 +155,6 @@
                     <td class="text-center no-wrap">{{ $row['no_transaksi'] }}</td>
                     <td>{{ trim($row['jenis_transaksi']) }}</td>
                     <td class="keterangan">{{ $keterangan }}</td>
-                    <td class="text-center">{{ $row['id_klasifikasi'] }}</td>
-                    <td>{{ trim($row['kriteria']) }}</td>
-                    <td>{{ trim($row['klasifikasi']) }}</td>
                     <td class="currency">
                         @if($row['nominal_pemasukan'] > 0)
                             {{ number_format($row['nominal_pemasukan'], 2, '.', ',') }}
@@ -180,7 +175,7 @@
             
             <!-- Baris Total -->
             <tr class="total-row">
-                <td colspan="7" class="text-center"><strong>TOTAL</strong></td>
+                <td colspan="4" class="text-center"><strong>TOTAL</strong></td>
                 <td class="currency"><strong>{{ number_format($totalKM, 2, '.', ',') }}</strong></td>
                 <td class="currency"><strong>{{ number_format($totalKK, 2, '.', ',') }}</strong></td>
                 <td class="currency"><strong>{{ number_format($saldoAkhir, 2, '.', ',') }}</strong></td>

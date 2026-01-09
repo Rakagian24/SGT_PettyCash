@@ -91,51 +91,58 @@ class SummaryPengajuanBudgetResource extends Resource
 
                 TextInput::make('kgs')
                     ->label('Kas Kecil')
-                    ->numeric()
                     ->prefix('Rp')
                     ->disabled()
                     ->dehydrated()
                     ->live()
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                         $set('total', self::calculateTotal($get));
+                    })
+                    ->formatStateUsing(function ($state) {
+                        return $state ? number_format((float) $state, 2, '.', ',') : '';
                     }),
 
                 TextInput::make('ogs')
                     ->label('Kas Office')
-                    ->numeric()
                     ->prefix('Rp')
                     ->disabled()
                     ->dehydrated()
                     ->live()
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                         $set('total', self::calculateTotal($get));
+                    })
+                    ->formatStateUsing(function ($state) {
+                        return $state ? number_format((float) $state, 2, '.', ',') : '';
                     }),
 
                 TextInput::make('pgs')
                     ->label('Kas Personalia')
-                    ->numeric()
                     ->prefix('Rp')
                     ->disabled()
                     ->dehydrated()
                     ->live()
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                         $set('total', self::calculateTotal($get));
+                    })
+                    ->formatStateUsing(function ($state) {
+                        return $state ? number_format((float) $state, 2, '.', ',') : '';
                     }),
 
                 TextInput::make('bgs')
                     ->label('Kas Bangunan')
-                    ->numeric()
                     ->prefix('Rp')
                     ->disabled()
                     ->dehydrated()
                     ->live()
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                         $set('total', self::calculateTotal($get));
+                    })
+                    ->formatStateUsing(function ($state) {
+                        return $state ? number_format((float) $state, 2, '.', ',') : '';
                     }),
 
                 TextInput::make('total')
                     ->label('Total Pengajuan')
-                    ->numeric()
                     ->prefix('Rp')
                     ->disabled()
                     ->dehydrated(false)
@@ -143,14 +150,34 @@ class SummaryPengajuanBudgetResource extends Resource
                     ->default(0)
                     ->afterStateHydrated(function ($component, $state, callable $get) {
                         $component->state(self::calculateTotal($get));
+                    })
+                    ->formatStateUsing(function ($state) {
+                        return $state ? number_format((float) $state, 2, '.', ',') : '';
                     }),
 
                 TextInput::make('pembulatan')
                     ->label('Pembulatan')
-                    ->numeric()
                     ->required()
                     ->prefix('Rp')
-                    ->default(0),
+                    ->default(0)
+                    ->placeholder('Contoh: 25000.65')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if ($state && $state !== '') {
+                            $cleanValue = str_replace(',', '', $state);
+                            if (is_numeric($cleanValue)) {
+                                $numericValue = (float) $cleanValue;
+                                $formatted = number_format($numericValue, 2, '.', ',');
+                                $set('pembulatan', $formatted);
+                            }
+                        }
+                    })
+                    ->dehydrateStateUsing(function ($state) {
+                        return $state ? (float) str_replace(',', '', $state) : null;
+                    })
+                    ->formatStateUsing(function ($state) {
+                        return $state ? number_format((float) $state, 2, '.', ',') : '';
+                    }),
             ]);
     }
 
