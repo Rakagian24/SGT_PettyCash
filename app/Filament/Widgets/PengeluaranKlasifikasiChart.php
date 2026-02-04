@@ -85,10 +85,23 @@ class PengeluaranKlasifikasiChart extends ChartWidget
         $startOfMonth = Carbon::now()->startOfMonth()->format('Y-m-d');
         $endOfMonth = Carbon::now()->endOfMonth()->format('Y-m-d');
         
-        $pengeluaran = DB::table('transaksi_kk as kk')
+        $user = auth()->user();
+        $allowedJenisKas = [];
+        
+        if ($user && !$user->isSuperAdmin()) {
+            $allowedJenisKas = $user->getAllowedJenisKasIds();
+        }
+        
+        $query = DB::table('transaksi_kk as kk')
             ->join('master_klasifikasi as mk', 'kk.id_klasifikasi', '=', 'mk.id_klasifikasi')
             ->select('mk.klasifikasi', DB::raw('SUM(kk.nominal_kk) as total'))
-            ->whereBetween('kk.tanggal_kk', [$startOfMonth, $endOfMonth])
+            ->whereBetween('kk.tanggal_kk', [$startOfMonth, $endOfMonth]);
+        
+        if (!empty($allowedJenisKas)) {
+            $query->whereIn('kk.id_jenis_kas', $allowedJenisKas);
+        }
+        
+        $pengeluaran = $query
             ->groupBy('mk.klasifikasi', 'mk.id_klasifikasi')
             ->orderBy('total', 'desc')
             ->limit(8) // Ambil 8 klasifikasi teratas

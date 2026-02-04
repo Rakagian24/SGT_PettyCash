@@ -36,7 +36,18 @@ class TransaksiKkResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return TransaksiKksTable::configure($table);
+        $table = TransaksiKksTable::configure($table);
+        
+        // Apply jenis kas filter for non-super admin users
+        $user = auth()->user();
+        if ($user && !$user->isSuperAdmin()) {
+            $allowedJenisKas = $user->getAllowedJenisKasIds();
+            if (!empty($allowedJenisKas)) {
+                $table->modifyQueryUsing(fn ($query) => $query->whereIn('id_jenis_kas', $allowedJenisKas));
+            }
+        }
+        
+        return $table;
     }
 
     public static function getRelations(): array

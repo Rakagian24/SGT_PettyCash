@@ -71,12 +71,22 @@ class TransaksiKmsTable
                     }),
                 SelectFilter::make('id_jenis_kas')
                     ->label('Jenis Kas')
-                    ->options([
-                        1 => 'Kas Kecil (KGS)',
-                        2 => 'Kas Office (OGS)',
-                        3 => 'Kas Personalia (PGS)',
-                        4 => 'Kas Bangunan (BGS)',
-                    ]),
+                    ->options(function () {
+                        $user = auth()->user();
+                        $allOptions = [
+                            1 => 'Kas Kecil (KGS)',
+                            2 => 'Kas Office (OGS)',
+                            3 => 'Kas Personalia (PGS)',
+                            4 => 'Kas Bangunan (BGS)',
+                        ];
+                        
+                        if ($user && !$user->isSuperAdmin()) {
+                            $allowedIds = $user->getAllowedJenisKasIds();
+                            return array_intersect_key($allOptions, array_flip($allowedIds));
+                        }
+                        
+                        return $allOptions;
+                    }),
             ])
             ->defaultSort('tanggal_km', 'desc')
             ->recordActions([

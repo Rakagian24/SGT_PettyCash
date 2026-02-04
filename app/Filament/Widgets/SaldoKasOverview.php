@@ -46,7 +46,20 @@ class SaldoKasOverview extends BaseWidget
     
     private function getSaldoPerJenisKas(): array
     {
-        $jenisKasList = MasterJenisKas::where('status', 0)->get();
+        $user = auth()->user();
+        $allowedJenisKas = [];
+        
+        if ($user && !$user->isSuperAdmin()) {
+            $allowedJenisKas = $user->getAllowedJenisKasIds();
+        }
+        
+        $jenisKasQuery = MasterJenisKas::where('status', 0);
+        
+        if (!empty($allowedJenisKas)) {
+            $jenisKasQuery->whereIn('id_jenis_kas', $allowedJenisKas);
+        }
+        
+        $jenisKasList = $jenisKasQuery->get();
         $saldoData = [];
         
         foreach ($jenisKasList as $jenisKas) {
@@ -74,21 +87,26 @@ class SaldoKasOverview extends BaseWidget
     {
         $today = now()->format('Y-m-d');
         
-        $kasmasuk = DB::table('transaksi_km')
-            ->whereDate('tanggal_km', $today)
-            ->sum('nominal_km');
-            
-        $countKm = DB::table('transaksi_km')
-            ->whereDate('tanggal_km', $today)
-            ->count();
-            
-        $kaskeluar = DB::table('transaksi_kk')
-            ->whereDate('tanggal_kk', $today)
-            ->sum('nominal_kk');
-            
-        $countKk = DB::table('transaksi_kk')
-            ->whereDate('tanggal_kk', $today)
-            ->count();
+        $user = auth()->user();
+        $allowedJenisKas = [];
+        
+        if ($user && !$user->isSuperAdmin()) {
+            $allowedJenisKas = $user->getAllowedJenisKasIds();
+        }
+        
+        $kmQuery = DB::table('transaksi_km')->whereDate('tanggal_km', $today);
+        $kkQuery = DB::table('transaksi_kk')->whereDate('tanggal_kk', $today);
+        
+        if (!empty($allowedJenisKas)) {
+            $kmQuery->whereIn('id_jenis_kas', $allowedJenisKas);
+            $kkQuery->whereIn('id_jenis_kas', $allowedJenisKas);
+        }
+        
+        $kasmasuk = $kmQuery->sum('nominal_km');
+        $countKm = $kmQuery->count();
+        
+        $kaskeluar = $kkQuery->sum('nominal_kk');
+        $countKk = $kkQuery->count();
         
         return [
             'kas_masuk' => $kasmasuk,

@@ -82,6 +82,13 @@ class AliranKasChart extends ChartWidget
         $kasmasuk = [];
         $kaskeluar = [];
         
+        $user = auth()->user();
+        $allowedJenisKas = [];
+        
+        if ($user && !$user->isSuperAdmin()) {
+            $allowedJenisKas = $user->getAllowedJenisKasIds();
+        }
+        
         // Generate data untuk 7 hari terakhir
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
@@ -91,15 +98,19 @@ class AliranKasChart extends ChartWidget
             $labels[] = $date->format('d M');
             
             // Kas masuk per hari
-            $kmHarian = DB::table('transaksi_km')
-                ->whereDate('tanggal_km', $dateString)
-                ->sum('nominal_km');
+            $kmQuery = DB::table('transaksi_km')->whereDate('tanggal_km', $dateString);
+            if (!empty($allowedJenisKas)) {
+                $kmQuery->whereIn('id_jenis_kas', $allowedJenisKas);
+            }
+            $kmHarian = $kmQuery->sum('nominal_km');
             $kasmasuk[] = (float) $kmHarian;
             
             // Kas keluar per hari
-            $kkHarian = DB::table('transaksi_kk')
-                ->whereDate('tanggal_kk', $dateString)
-                ->sum('nominal_kk');
+            $kkQuery = DB::table('transaksi_kk')->whereDate('tanggal_kk', $dateString);
+            if (!empty($allowedJenisKas)) {
+                $kkQuery->whereIn('id_jenis_kas', $allowedJenisKas);
+            }
+            $kkHarian = $kkQuery->sum('nominal_kk');
             $kaskeluar[] = (float) $kkHarian;
         }
         

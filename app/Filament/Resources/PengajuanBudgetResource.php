@@ -86,7 +86,16 @@ class PengajuanBudgetResource extends Resource
 
                 Select::make('id_jenis_kas')
                     ->label('Jenis Kas')
-                    ->options(MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas'))
+                    ->options(function () {
+                        $user = auth()->user();
+                        if ($user && !$user->isSuperAdmin()) {
+                            $allowedIds = $user->getAllowedJenisKasIds();
+                            return MasterJenisKas::where('status', 0)
+                                ->whereIn('id_jenis_kas', $allowedIds)
+                                ->pluck('jenis_kas', 'id_jenis_kas');
+                        }
+                        return MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas');
+                    })
                     ->required()
                     ->searchable()
                     ->native(false),
@@ -221,7 +230,7 @@ class PengajuanBudgetResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table
+        $table = $table
             ->columns([
                 TextColumn::make('id_pengajuan_budget')
                     ->label('ID Pengajuan Budget')
@@ -272,7 +281,16 @@ class PengajuanBudgetResource extends Resource
             ->filters([
                 SelectFilter::make('id_jenis_kas')
                     ->label('Jenis Kas')
-                    ->options(MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas')),
+                    ->options(function () {
+                        $user = auth()->user();
+                        if ($user && !$user->isSuperAdmin()) {
+                            $allowedIds = $user->getAllowedJenisKasIds();
+                            return MasterJenisKas::where('status', 0)
+                                ->whereIn('id_jenis_kas', $allowedIds)
+                                ->pluck('jenis_kas', 'id_jenis_kas');
+                        }
+                        return MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas');
+                    }),
 
                 Filter::make('tgl_dari')
                     ->form([
@@ -303,6 +321,17 @@ class PengajuanBudgetResource extends Resource
                 ]),
             ])
             ->defaultSort('tgl_input', 'desc');
+        
+        // Apply jenis kas filter for non-super admin users
+        $user = auth()->user();
+        if ($user && !$user->isSuperAdmin()) {
+            $allowedJenisKas = $user->getAllowedJenisKasIds();
+            if (!empty($allowedJenisKas)) {
+                $table->modifyQueryUsing(fn ($query) => $query->whereIn('id_jenis_kas', $allowedJenisKas));
+            }
+        }
+        
+        return $table;
     }
 
     public static function getPages(): array

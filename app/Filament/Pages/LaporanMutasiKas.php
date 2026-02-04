@@ -379,8 +379,28 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
                             ->native(false),
                         Select::make('id_jenis_kas')
                             ->label('Jenis Kas')
-                            ->options(MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas'))
-                            ->default(fn () => MasterJenisKas::where('status', 0)->first()?->id_jenis_kas)
+                            ->options(function () {
+                                $user = auth()->user();
+                                if ($user && !$user->isSuperAdmin()) {
+                                    $allowedIds = $user->getAllowedJenisKasIds();
+                                    return MasterJenisKas::where('status', 0)
+                                        ->whereIn('id_jenis_kas', $allowedIds)
+                                        ->pluck('jenis_kas', 'id_jenis_kas');
+                                }
+                                return MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas');
+                            })
+                            ->default(function () {
+                                $user = auth()->user();
+                                if ($user && !$user->isSuperAdmin()) {
+                                    $allowedIds = $user->getAllowedJenisKasIds();
+                                    if (!empty($allowedIds)) {
+                                        return $allowedIds[0];
+                                    }
+                                    return null;
+                                }
+                                $firstJenisKas = MasterJenisKas::where('status', 0)->first();
+                                return $firstJenisKas ? $firstJenisKas->id_jenis_kas : null;
+                            })
                             ->required()
                             ->native(false)
                             ->searchable(),

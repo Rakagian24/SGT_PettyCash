@@ -83,6 +83,14 @@ class WebUserResource extends Resource
                     ->columns(2)
                     ->visible(fn (callable $get) => $get('role') !== 'super_admin')
                     ->helperText('Super Admin memiliki akses ke semua menu secara otomatis'),
+
+                CheckboxList::make('allowed_jenis_kas')
+                    ->label('Akses Jenis Kas')
+                    ->options(WebUser::getAvailableJenisKas())
+                    ->columns(2)
+                    ->visible(fn (callable $get) => $get('role') !== 'super_admin')
+                    ->helperText('Pilih jenis kas yang dapat diakses user. Super Admin dapat mengakses semua jenis kas.')
+                    ->default([1, 2, 3, 4]),
                     
                 Toggle::make('is_active')
                     ->label('Aktif')

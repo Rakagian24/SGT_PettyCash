@@ -23,6 +23,7 @@ class WebUser extends Authenticatable implements FilamentUser
         'password',
         'role',
         'permissions',
+        'allowed_jenis_kas',
         'is_active',
     ];
 
@@ -67,6 +68,7 @@ class WebUser extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'permissions' => 'array',
+            'allowed_jenis_kas' => 'array',
             'is_active' => 'boolean',
         ];
     }
@@ -105,6 +107,48 @@ class WebUser extends Authenticatable implements FilamentUser
     public function isSuperAdmin(): bool
     {
         return $this->role === 'super_admin';
+    }
+
+    /**
+     * Check if user can access specific jenis kas
+     */
+    public function canAccessJenisKas($jenisKasId): bool
+    {
+        // Super admin can access all jenis kas
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        // Check if user has allowed_jenis_kas set
+        $allowedJenisKas = $this->allowed_jenis_kas ?? [];
+        
+        return in_array($jenisKasId, $allowedJenisKas);
+    }
+
+    /**
+     * Get array of allowed jenis kas IDs
+     */
+    public function getAllowedJenisKasIds(): array
+    {
+        // Super admin can access all jenis kas
+        if ($this->isSuperAdmin()) {
+            return [1, 2, 3, 4];
+        }
+
+        return $this->allowed_jenis_kas ?? [];
+    }
+
+    /**
+     * Get available jenis kas options with labels
+     */
+    public static function getAvailableJenisKas(): array
+    {
+        return [
+            1 => 'Kas Kecil (KGS)',
+            2 => 'Kas Operasional (OGS)',
+            3 => 'Kas Personalia (PGS)',
+            4 => 'Kas Bangunan (BGS)',
+        ];
     }
 
     /**

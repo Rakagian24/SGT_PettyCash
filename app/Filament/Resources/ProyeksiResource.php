@@ -76,7 +76,16 @@ class ProyeksiResource extends Resource
 
                 Select::make('id_jenis_kas')
                     ->label('Jenis Kas')
-                    ->options(MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas'))
+                    ->options(function () {
+                        $user = auth()->user();
+                        if ($user && !$user->isSuperAdmin()) {
+                            $allowedIds = $user->getAllowedJenisKasIds();
+                            return MasterJenisKas::where('status', 0)
+                                ->whereIn('id_jenis_kas', $allowedIds)
+                                ->pluck('jenis_kas', 'id_jenis_kas');
+                        }
+                        return MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas');
+                    })
                     ->required()
                     ->searchable()
                     ->native(false),
@@ -155,7 +164,7 @@ class ProyeksiResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table
+        $table = $table
             ->columns([
                 TextColumn::make('id_proyeksi')
                     ->label('ID Proyeksi')
@@ -203,7 +212,16 @@ class ProyeksiResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('id_jenis_kas')
                     ->label('Jenis Kas')
-                    ->options(MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas')),
+                    ->options(function () {
+                        $user = auth()->user();
+                        if ($user && !$user->isSuperAdmin()) {
+                            $allowedIds = $user->getAllowedJenisKasIds();
+                            return MasterJenisKas::where('status', 0)
+                                ->whereIn('id_jenis_kas', $allowedIds)
+                                ->pluck('jenis_kas', 'id_jenis_kas');
+                        }
+                        return MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas');
+                    }),
 
                 Tables\Filters\Filter::make('tgl_dari')
                     ->form([
@@ -225,6 +243,17 @@ class ProyeksiResource extends Resource
                 // Bulk actions removed due to compatibility issues
             ])
             ->defaultSort('tgl_input', 'desc');
+        
+        // Apply jenis kas filter for non-super admin users
+        $user = auth()->user();
+        if ($user && !$user->isSuperAdmin()) {
+            $allowedJenisKas = $user->getAllowedJenisKasIds();
+            if (!empty($allowedJenisKas)) {
+                $table->modifyQueryUsing(fn ($query) => $query->whereIn('id_jenis_kas', $allowedJenisKas));
+            }
+        }
+        
+        return $table;
     }
 
     public static function getPages(): array
