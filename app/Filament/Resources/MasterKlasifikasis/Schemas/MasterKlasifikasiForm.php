@@ -11,18 +11,39 @@ class MasterKlasifikasiForm
     {
         return $schema
             ->components([
+                TextInput::make('id_klasifikasi')
+                    ->label('ID Klasifikasi')
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true)
+                    ->helperText('Masukkan ID Klasifikasi unik'),
+                    
                 TextInput::make('kriteria')
-                    ->default(null),
+                    ->label('Kriteria')
+                    ->required()
+                    ->maxLength(255),
+                    
                 TextInput::make('klasifikasi')
-                    ->default(null),
+                    ->label('Klasifikasi')
+                    ->required()
+                    ->maxLength(255),
+                    
                 TextInput::make('coa')
-                    ->numeric()
-                    ->default(null),
+                    ->label('COA')
+                    ->maxLength(255),
+                    
                 TextInput::make('tipe_klasifikasi')
-                    ->default(null),
+                    ->label('Tipe Klasifikasi')
+                    ->required()
+                    ->maxLength(255)
+                    ->helperText('Contoh: KM (Kas Masuk) atau KK (Kas Keluar)'),
+                    
                 TextInput::make('status')
+                    ->label('Status')
                     ->numeric()
-                    ->default(0),
+                    ->default(0)
+                    ->dehydrated()
+                    ->hidden(),
             ]);
     }
 }
