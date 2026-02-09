@@ -120,8 +120,11 @@ class PengajuanBudgetResource extends Resource
                         
                         // Auto calculate nominal_pengajuan when kisaran_saldo changes
                         $details = $get('details') ?? [];
-                        $totalDetail = collect($details)->sum('nominal_pengajuan_dtl');
-                        $kisaranSaldo = floatval(str_replace(',', '', $state ?? 0));
+                        $totalDetail = collect($details)->sum(function($detail) {
+                            $value = $detail['nominal_pengajuan_dtl'] ?? 0;
+                            return (float) str_replace(',', '', $value);
+                        });
+                        $kisaranSaldo = (float) str_replace(',', '', $state ?? 0);
                         
                         if ($totalDetail >= $kisaranSaldo) {
                             $pengajuan = $totalDetail - $kisaranSaldo;
