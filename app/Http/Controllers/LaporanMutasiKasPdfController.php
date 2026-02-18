@@ -9,6 +9,9 @@ class LaporanMutasiKasPdfController extends Controller
 {
     public function generatePdf(Request $request)
     {
+        // Increase memory limit untuk data banyak
+        ini_set('memory_limit', '512M');
+        
         $sessionKey = $request->get('session_key');
         
         if (!$sessionKey) {
@@ -37,11 +40,11 @@ class LaporanMutasiKasPdfController extends Controller
         }
         
         // Format periode yang lebih lengkap
-        $periodeText = "Periode {$dari} sampai {$sampai}";
+        $periodeText = "Periode {$dari} s/d {$sampai}";
         
         try {
             // Generate PDF langsung
-            $pdf = Pdf::loadView('pdf.laporan-mutasi-kas-compact', compact('jenisKas', 'periodeText', 'data'));
+            $pdf = Pdf::loadView('pdf.laporan-mutasi-kas-v4', compact('jenisKas', 'periodeText', 'data'));
             
             // Set paper size dan orientation
             $pdf->setPaper('A4', 'portrait');

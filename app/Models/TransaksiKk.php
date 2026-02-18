@@ -8,7 +8,7 @@ class TransaksiKk extends Model
 {
     protected $table = 'transaksi_kk';
     protected $primaryKey = 'idx';
-    public $timestamps = false;
+    public $timestamps = true; // Enable timestamps
     protected $fillable = [
         'tanggal_kk',
         'id_jenis_kas',

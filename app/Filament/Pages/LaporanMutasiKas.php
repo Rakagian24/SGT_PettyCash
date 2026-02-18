@@ -439,22 +439,22 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
             
             if ($this->currentDari && $this->currentSampai) {
                 try {
-                    $dari = \Carbon\Carbon::parse($this->currentDari)->format('d-M-Y');
-                    $sampai = \Carbon\Carbon::parse($this->currentSampai)->format('d-M-Y');
+                    $dari = \Carbon\Carbon::parse($this->currentDari)->format('d.m.Y');
+                    $sampai = \Carbon\Carbon::parse($this->currentSampai)->format('d.m.Y');
                 } catch (\Exception $e) {
-                    $dari = date('d-M-Y');
-                    $sampai = date('d-M-Y');
+                    $dari = date('d.m.Y');
+                    $sampai = date('d.m.Y');
                 }
             }
             
             // Format periode lengkap
-            $periode = "Periode {$dari} sampai {$sampai}";
+            $periode = "Periode {$dari} s/d {$sampai}";
             
             // Generate filename yang aman
             $filename = "Laporan_Mutasi_Kas_{$jenisKas}_Periode_{$dari}_sd_{$sampai}.xlsx";
             
             // Bersihkan karakter yang tidak valid untuk nama file
-            $filename = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $filename);
+            $filename = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|', '.'], '_', $filename);
             
             return Excel::download(
                 new LaporanMutasiKasExport($this->cachedResults, $jenisKas, $periode),
@@ -499,11 +499,11 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
             
             if ($this->currentDari && $this->currentSampai) {
                 try {
-                    $dari = \Carbon\Carbon::parse($this->currentDari)->format('d-M-Y');
-                    $sampai = \Carbon\Carbon::parse($this->currentSampai)->format('d-M-Y');
+                    $dari = \Carbon\Carbon::parse($this->currentDari)->format('d.m.Y');
+                    $sampai = \Carbon\Carbon::parse($this->currentSampai)->format('d.m.Y');
                 } catch (\Exception $e) {
-                    $dari = date('d-M-Y');
-                    $sampai = date('d-M-Y');
+                    $dari = date('d.m.Y');
+                    $sampai = date('d.m.Y');
                 }
             }
             
@@ -523,7 +523,8 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
             
             // Return URL dengan session key saja
             return route('laporan.mutasi.kas.pdf', [
-                'session_key' => $sessionKey
+                'session_key' => $sessionKey,
+                'v' => time() // Cache buster
             ]);
             
         } catch (\Exception $e) {
