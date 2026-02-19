@@ -450,11 +450,14 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
             // Format periode lengkap
             $periode = "Periode {$dari} s/d {$sampai}";
             
-            // Generate filename yang aman
-            $filename = "Laporan_Mutasi_Kas_{$jenisKas}_Periode_{$dari}_sd_{$sampai}.xlsx";
+            // Generate filename yang aman (tanpa extension dulu)
+            $filename = "Laporan_Mutasi_Kas_{$jenisKas}_Periode_{$dari}_sd_{$sampai}";
             
-            // Bersihkan karakter yang tidak valid untuk nama file
+            // Bersihkan karakter yang tidak valid untuk nama file (kecuali titik untuk extension)
             $filename = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|', '.'], '_', $filename);
+            
+            // Tambahkan extension setelah cleaning
+            $filename = $filename . '.xlsx';
             
             return Excel::download(
                 new LaporanMutasiKasExport($this->cachedResults, $jenisKas, $periode),
