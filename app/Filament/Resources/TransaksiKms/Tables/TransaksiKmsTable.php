@@ -77,7 +77,7 @@ class TransaksiKmsTable
                             1 => 'Kas Kecil (KGS)',
                             2 => 'Kas Office (OGS)',
                             3 => 'Kas Personalia (PGS)',
-                            4 => 'Kas Bangunan (BGS)',
+                            4 => 'Kas GS2 (GS2)',
                         ];
                         
                         if ($user && !$user->isSuperAdmin()) {

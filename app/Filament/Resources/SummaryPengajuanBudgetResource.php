@@ -129,7 +129,7 @@ class SummaryPengajuanBudgetResource extends Resource
                     }),
 
                 TextInput::make('bgs')
-                    ->label('Kas Bangunan')
+                    ->label('Kas GS2')
                     ->prefix('Rp')
                     ->disabled()
                     ->dehydrated()
@@ -242,7 +242,7 @@ class SummaryPengajuanBudgetResource extends Resource
                     ->sortable(),
 
                 TextColumn::make('bgs')
-                    ->label('Kas Bangunan')
+                    ->label('Kas GS2')
                     ->formatStateUsing(fn ($state) => number_format($state, 2, '.', ','))
                     ->sortable(),
 

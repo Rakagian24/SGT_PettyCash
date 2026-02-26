@@ -62,7 +62,7 @@ class TransaksiKm extends Model
             1 => 'KGS',
             2 => 'OGS',
             3 => 'PGS',
-            4 => 'BGS',
+            4 => 'GS2',
         ];
         
         $code = $map[$jenisKas] ?? 'GEN';
@@ -93,7 +93,7 @@ class TransaksiKm extends Model
             1 => 'KGS',
             2 => 'OGS',
             3 => 'PGS',
-            4 => 'BGS',
+            4 => 'GS2',
         ];
         
         $code = $map[$jenisKas] ?? 'GEN';
@@ -124,7 +124,7 @@ class TransaksiKm extends Model
                     1 => 'KGS',
                     2 => 'OGS',
                     3 => 'PGS',
-                    4 => 'BGS',
+                    4 => 'GS2',
                 ];
                 $code = $map[$model->id_jenis_kas] ?? 'GEN';
                 // Assuming tanggal_km is cast to date or string. If string, parse it.
@@ -171,7 +171,7 @@ class TransaksiKm extends Model
                         1 => 'KGS',
                         2 => 'OGS',
                         3 => 'PGS',
-                        4 => 'BGS',
+                        4 => 'GS2',
                     ];
                     $code = $map[$newJenisKas] ?? 'GEN';
                     $date = \Carbon\Carbon::parse($newDate);

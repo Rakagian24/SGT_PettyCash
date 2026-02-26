@@ -50,7 +50,7 @@
         
         <!-- Kas Bangunan -->
         <tr>
-            <td class="no-border col-label left">KAS BANGUNAN</td>
+            <td class="no-border col-label left">KAS GS2</td>
             <td class="no-border col-value right">{{ number_format($summaryPengajuanBudget->bgs, 2, '.', ',') }}</td>
         </tr>
         

@@ -147,7 +147,7 @@ class WebUser extends Authenticatable implements FilamentUser
             1 => 'Kas Kecil (KGS)',
             2 => 'Kas Operasional (OGS)',
             3 => 'Kas Personalia (PGS)',
-            4 => 'Kas Bangunan (BGS)',
+            4 => 'Kas GS2 (GS2)',
         ];
     }
 

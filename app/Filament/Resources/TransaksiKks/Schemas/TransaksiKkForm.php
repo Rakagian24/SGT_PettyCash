@@ -53,7 +53,7 @@ class TransaksiKkForm
                             1 => 'Kas Kecil (KGS)',
                             2 => 'Kas Office (OGS)',
                             3 => 'Kas Personalia (PGS)',
-                            4 => 'kas Bangunan (BGS)',
+                            4 => 'Kas GS2 (GS2)',
                         ];
                         
                         if ($user && !$user->isSuperAdmin()) {

@@ -93,7 +93,7 @@ class SummaryPengajuanBudget extends Model
                 case 'KAS PERSONALIA':
                     $data['pgs'] = $result->total_nominal;
                     break;
-                case 'KAS BANGUNAN':
+                case 'KAS GS2':
                     $data['bgs'] = $result->total_nominal;
                     break;
             }
