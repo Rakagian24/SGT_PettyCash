@@ -36,7 +36,8 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
 
     public static function shouldRegisterNavigation(): bool
     {
-        $user = auth()->user();
+        /** @var \App\Models\User|null $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
         if (!$user) return false;
         
         if ($user->isSuperAdmin()) {
@@ -48,7 +49,8 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
 
     public static function canAccess(): bool
     {
-        $user = auth()->user();
+        /** @var \App\Models\User|null $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
         if (!$user) return false;
         
         if ($user->isSuperAdmin()) {
@@ -62,13 +64,13 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
 
 
 
-    public $cachedResults = null;
-    public $currentJenisKas = null;
-    public $currentDari = null;
-    public $currentSampai = null;
+    public ?\Illuminate\Support\Collection $cachedResults = null;
+    public ?int $currentJenisKas = null;
+    public ?string $currentDari = null;
+    public ?string $currentSampai = null;
 
 
-    public function getTableQuery(): \Illuminate\Database\Eloquent\Builder
+    public function getTableQuery(): Builder
     {
         // Return a dummy query that Filament expects
         // The actual data is fetched in the filter's query callback or getTableRecords
@@ -290,7 +292,7 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
         );
     }
 
-    public function getTableRecordKey($record): string
+    public function getTableRecordKey(\Illuminate\Database\Eloquent\Model|array $record): string
     {
         // Tell Filament to use 'key' field as the unique identifier
         return (string) $record['key'];
@@ -380,7 +382,8 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
                         Select::make('id_jenis_kas')
                             ->label('Jenis Kas')
                             ->options(function () {
-                                $user = auth()->user();
+                                /** @var \App\Models\User|null $user */
+                                $user = \Illuminate\Support\Facades\Auth::user();
                                 if ($user && !$user->isSuperAdmin()) {
                                     $allowedIds = $user->getAllowedJenisKasIds();
                                     return MasterJenisKas::where('status', 0)
@@ -390,7 +393,8 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
                                 return MasterJenisKas::where('status', 0)->pluck('jenis_kas', 'id_jenis_kas');
                             })
                             ->default(function () {
-                                $user = auth()->user();
+                                /** @var \App\Models\User|null $user */
+                                $user = \Illuminate\Support\Facades\Auth::user();
                                 if ($user && !$user->isSuperAdmin()) {
                                     $allowedIds = $user->getAllowedJenisKasIds();
                                     if (!empty($allowedIds)) {
@@ -472,7 +476,7 @@ class LaporanMutasiKas extends Page implements HasForms, HasTable
                 ->send();
             
             // Log error untuk debugging
-            \Log::error('Export Excel Error: ' . $e->getMessage(), [
+            \Illuminate\Support\Facades\Log::error('Export Excel Error: ' . $e->getMessage(), [
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()

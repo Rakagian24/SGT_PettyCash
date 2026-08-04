@@ -62,25 +62,25 @@ class TransaksiKk extends Model
             1 => 'KGS',
             2 => 'OGS',
             3 => 'PGS',
-            4 => 'GS2',
+            4 => 'SGT',
         ];
-        
+
         $code = $map[$jenisKas] ?? 'GEN';
         $date = $tanggal ? \Carbon\Carbon::parse($tanggal) : now();
-        $yymm = $date->format('ym'); 
+        $yymm = $date->format('ym');
         $prefix = "KK-{$code}-{$yymm}-";
 
         // Find last record for this period and type
         $last = static::where('no_kk', 'like', "{$prefix}%")
             ->orderBy('idx', 'desc')
             ->first();
-        
+
         $seq = 1;
         if ($last) {
             $lastSeq = (int) substr($last->no_kk, strlen($prefix));
             $seq = $lastSeq + 1;
         }
-        
+
         return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
     }
 
@@ -93,12 +93,12 @@ class TransaksiKk extends Model
             1 => 'KGS',
             2 => 'OGS',
             3 => 'PGS',
-            4 => 'GS2',
+            4 => 'SGT',
         ];
-        
+
         $code = $map[$jenisKas] ?? 'GEN';
         $date = \Carbon\Carbon::parse($tanggal);
-        $yymm = $date->format('ym'); 
+        $yymm = $date->format('ym');
         $prefix = "KK-{$code}-{$yymm}-";
 
         // Find last record for this period and type (excluding current record)
@@ -106,13 +106,13 @@ class TransaksiKk extends Model
             ->where('idx', '!=', $excludeIdx)
             ->orderBy('idx', 'desc')
             ->first();
-        
+
         $seq = 1;
         if ($last) {
             $lastSeq = (int) substr($last->no_kk, strlen($prefix));
             $seq = $lastSeq + 1;
         }
-        
+
         return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
     }
 
@@ -124,24 +124,24 @@ class TransaksiKk extends Model
                     1 => 'KGS',
                     2 => 'OGS',
                     3 => 'PGS',
-                    4 => 'GS2',
+                    4 => 'SGT',
                 ];
                 $code = $map[$model->id_jenis_kas] ?? 'GEN';
                 $date = $model->tanggal_kk ? \Carbon\Carbon::parse($model->tanggal_kk) : now();
-                $yymm = $date->format('ym'); 
+                $yymm = $date->format('ym');
                 $prefix = "KK-{$code}-{$yymm}-";
 
                 $last = static::where('no_kk', 'like', "{$prefix}%")
                     ->orderBy('idx', 'desc')
                     ->first();
-                
+
                 $seq = 1;
                 if ($last) {
                     $lastSeq = (int) substr($last->no_kk, strlen($prefix));
                     $seq = $lastSeq + 1;
                 }
-                
-                
+
+
                 $model->no_kk = $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
             }
         });
@@ -153,18 +153,18 @@ class TransaksiKk extends Model
                 $newDate = $model->tanggal_kk;
                 $originalJenisKas = $model->getOriginal('id_jenis_kas');
                 $newJenisKas = $model->id_jenis_kas;
-                
+
                 // Parse dates
                 $originalPeriod = $originalDate ? \Carbon\Carbon::parse($originalDate)->format('ym') : null;
                 $newPeriod = $newDate ? \Carbon\Carbon::parse($newDate)->format('ym') : null;
-                
+
                 // Update transaction number if period or jenis kas changed
                 if ($originalPeriod !== $newPeriod || $originalJenisKas !== $newJenisKas) {
                     $map = [
                         1 => 'KGS',
                         2 => 'OGS',
                         3 => 'PGS',
-                        4 => 'GS2',
+                        4 => 'SGT',
                     ];
                     $code = $map[$newJenisKas] ?? 'GEN';
                     $date = \Carbon\Carbon::parse($newDate);
@@ -176,13 +176,13 @@ class TransaksiKk extends Model
                         ->where('idx', '!=', $model->idx) // Exclude current record
                         ->orderBy('idx', 'desc')
                         ->first();
-                    
+
                     $seq = 1;
                     if ($last) {
                         $lastSeq = (int) substr($last->no_kk, strlen($prefix));
                         $seq = $lastSeq + 1;
                     }
-                    
+
                     $model->no_kk = $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
                 }
             }

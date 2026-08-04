@@ -14,7 +14,7 @@ class WebUserSeeder extends Seeder
     {
         \App\Models\WebUser::create([
             'name' => 'Super Admin',
-            'email' => 'admin@gunajayasantosa.com',
+            'email' => 'admin@singaglobaltekstil.com',
             'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
             'role' => 'super_admin',
             'permissions' => null, // Super admin has all permissions
@@ -23,7 +23,7 @@ class WebUserSeeder extends Seeder
 
         \App\Models\WebUser::create([
             'name' => 'User Test',
-            'email' => 'user@gunajayasantosa.com',
+            'email' => 'user@singaglobaltekstil.com',
             'password' => \Illuminate\Support\Facades\Hash::make('user123'),
             'role' => 'user',
             'permissions' => [

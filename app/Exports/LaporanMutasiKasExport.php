@@ -16,9 +16,9 @@ use Illuminate\Support\Collection;
 
 class LaporanMutasiKasExport implements FromCollection, WithHeadings, WithColumnFormatting, WithEvents
 {
-    protected $data;
-    protected $jenisKas;
-    protected $periode;
+    protected Collection $data;
+    protected string $jenisKas;
+    protected string $periode;
 
     public function __construct(Collection $data, string $jenisKas, string $periode)
     {
@@ -27,21 +27,21 @@ class LaporanMutasiKasExport implements FromCollection, WithHeadings, WithColumn
         $this->periode = $periode;
     }
 
-    protected function cleanWhitespace($text)
+    protected function cleanWhitespace(?string $text): ?string
     {
         if (empty($text) || $text === '-') {
             return $text;
         }
-        
+
         // Hapus whitespace di awal dan akhir
         $text = trim($text);
-        
+
         // Hapus multiple spaces menjadi single space
         $text = preg_replace('/\s+/', ' ', $text);
-        
+
         // Hapus karakter tidak terlihat seperti tab, newline, dll
         $text = preg_replace('/[\r\n\t]/', ' ', $text);
-        
+
         // Trim lagi setelah pembersihan
         return trim($text);
     }
@@ -94,26 +94,26 @@ class LaporanMutasiKasExport implements FromCollection, WithHeadings, WithColumn
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                
+
                 // Insert header di baris 1 dan 2 sebelum data
                 $sheet->insertNewRowBefore(1, 2);
-                
+
                 // Header Judul (Row 1)
                 $sheet->mergeCells('A1:J1');
-                $sheet->setCellValue('A1', "LAPORAN MUTASI {$this->jenisKas} PT. GUNAJAYA SANTOSA");
-                
+                $sheet->setCellValue('A1', "LAPORAN MUTASI {$this->jenisKas} PT. SINGA GLOBAL TEKSTIL");
+
                 // Header Periode (Row 2)
                 $sheet->mergeCells('A2:J2');
                 $sheet->setCellValue('A2', "Periode {$this->periode}");
-                
+
                 // Style untuk header judul
                 $sheet->getStyle('A1')->applyFromArray([
                     'font' => ['bold' => true, 'size' => 12],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
                 ]);
-                
+
                 // Style untuk header periode
                 $sheet->getStyle('A2')->applyFromArray([
                     'font' => ['bold' => true, 'size' => 11],
@@ -121,7 +121,7 @@ class LaporanMutasiKasExport implements FromCollection, WithHeadings, WithColumn
                         'outline' => ['borderStyle' => Border::BORDER_THIN],
                     ],
                 ]);
-                
+
                 // Style untuk header kolom (sekarang di row 3)
                 $sheet->getStyle('A3:J3')->applyFromArray([
                     'font' => ['bold' => true],
@@ -130,9 +130,9 @@ class LaporanMutasiKasExport implements FromCollection, WithHeadings, WithColumn
                     ],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 ]);
-                
+
                 $highestRow = $sheet->getHighestRow();
-                
+
                 // Format tanggal untuk setiap baris data (mulai dari row 4)
                 for ($row = 4; $row <= $highestRow; $row++) {
                     $tanggalValue = $sheet->getCell("A{$row}")->getValue();
@@ -146,7 +146,7 @@ class LaporanMutasiKasExport implements FromCollection, WithHeadings, WithColumn
                         }
                     }
                 }
-                
+
                 // Apply borders untuk semua data (mulai dari row 4)
                 $dataRange = "A4:J{$highestRow}";
                 $sheet->getStyle($dataRange)->applyFromArray([
@@ -154,20 +154,20 @@ class LaporanMutasiKasExport implements FromCollection, WithHeadings, WithColumn
                         'allBorders' => ['borderStyle' => Border::BORDER_THIN],
                     ],
                 ]);
-                
+
                 // Tambah baris TOTAL
                 $totalRow = $highestRow + 1;
                 $sheet->setCellValue("G{$totalRow}", 'TOTAL');
-                
+
                 // Formula untuk total KM (kolom H) - mulai dari row 4
                 $sheet->setCellValue("H{$totalRow}", "=SUM(H4:H{$highestRow})");
-                
+
                 // Formula untuk total KK (kolom I) - mulai dari row 4
                 $sheet->setCellValue("I{$totalRow}", "=SUM(I4:I{$highestRow})");
-                
+
                 // Formula untuk saldo akhir (mengambil saldo terakhir)
                 $sheet->setCellValue("J{$totalRow}", "=J{$highestRow}");
-                
+
                 // Style untuk baris TOTAL
                 $sheet->getStyle("G{$totalRow}:J{$totalRow}")->applyFromArray([
                     'font' => ['bold' => true],
@@ -178,15 +178,15 @@ class LaporanMutasiKasExport implements FromCollection, WithHeadings, WithColumn
                         'formatCode' => '#,##0.00'
                     ]
                 ]);
-                
+
                 // Format kolom G (TOTAL label) sebagai text
                 $sheet->getStyle("G{$totalRow}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
-                
+
                 // Auto-fit semua kolom
                 foreach (range('A', 'J') as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
-                
+
                 // Set minimum width untuk kolom yang mungkin terlalu sempit
                 $sheet->getColumnDimension('A')->setWidth(12); // Tanggal
                 $sheet->getColumnDimension('B')->setWidth(15); // Nomor KM/KK (lebih lebar untuk nomor lengkap)

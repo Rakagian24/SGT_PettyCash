@@ -12,7 +12,7 @@ class CreateProyeksiUserSeeder extends Seeder
     {
         // Buat user baru dengan permission proyeksi
         WebUser::updateOrCreate(
-            ['email' => 'proyeksi@gunajayasantosa.com'],
+            ['email' => 'proyeksi@singaglobaltekstil.com'],
             [
                 'name' => 'User Proyeksi',
                 'password' => Hash::make('proyeksi123'),
@@ -25,6 +25,6 @@ class CreateProyeksiUserSeeder extends Seeder
             ]
         );
 
-        echo "User proyeksi@gunajayasantosa.com created/updated\n";
+        echo "User proyeksi@singaglobaltekstil.com created/updated\n";
     }
 }

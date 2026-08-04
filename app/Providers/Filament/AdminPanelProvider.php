@@ -27,8 +27,8 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('gs-pettycash')
-            ->brandName('GS Petty Cash')
+            ->path('sgt-pettycash')
+            ->brandName('SGT Petty Cash')
             ->favicon(asset('images/favicon.png'))
 
             ->colors([

@@ -121,7 +121,7 @@ class WebUser extends Authenticatable implements FilamentUser
 
         // Check if user has allowed_jenis_kas set
         $allowedJenisKas = $this->allowed_jenis_kas ?? [];
-        
+
         return in_array($jenisKasId, $allowedJenisKas);
     }
 
@@ -147,7 +147,7 @@ class WebUser extends Authenticatable implements FilamentUser
             1 => 'Kas Kecil (KGS)',
             2 => 'Kas Operasional (OGS)',
             3 => 'Kas Personalia (PGS)',
-            4 => 'Kas GS2 (GS2)',
+            4 => 'Kas SGT (SGT)',
         ];
     }
 
@@ -159,7 +159,7 @@ class WebUser extends Authenticatable implements FilamentUser
         return [
             'view_dashboard' => 'Dashboard',
             'view_transaksi_km' => 'Transaksi Kas Masuk',
-            'view_transaksi_kk' => 'Transaksi Kas Keluar', 
+            'view_transaksi_kk' => 'Transaksi Kas Keluar',
             'view_laporan_mutasi' => 'Laporan Mutasi Kas',
             'view_proyeksi' => 'Proyeksi',
             'view_pengajuan_budget' => 'Pengajuan Budget',

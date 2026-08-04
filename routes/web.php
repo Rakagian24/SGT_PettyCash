@@ -7,15 +7,15 @@ use Barryvdh\DomPDF\Facade\Pdf;
 Route::get('/', function () {
     // Jika user sudah login, redirect ke dashboard Filament
     if (auth()->check()) {
-        return redirect('/gs-pettycash');
+        return redirect('/sgt-pettycash');
     }
     // Jika belum login, redirect ke halaman login Filament
-    return redirect('/gs-pettycash/login');
+    return redirect('/sgt-pettycash/login');
 });
 
 // Route login - redirect ke Filament login
 Route::get('/login', function () {
-    return redirect('/gs-pettycash/login');
+    return redirect('/sgt-pettycash/login');
 })->name('login');
 
 // Route untuk PDF Laporan Mutasi Kas - Langsung generate PDF
