@@ -63,7 +63,7 @@ class LaporanMutasiKasPdfController extends Controller
             return $pdf->stream($filename);
             
         } catch (\Exception $e) {
-            \Log::error('PDF Generation Error: ' . $e->getMessage(), [
+            \Illuminate\Support\Facades\Log::error('PDF Generation Error: ' . $e->getMessage(), [
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'session_key' => $sessionKey

@@ -56,7 +56,7 @@ class TransaksiKm extends Model
     /**
      * Get next transaction number for preview
      */
-    public static function getNextTransactionNumber($jenisKas, $tanggal = null)
+    public static function getNextTransactionNumber(int|string $jenisKas, ?string $tanggal = null)
     {
         $map = [
             1 => 'KGS',
@@ -87,7 +87,7 @@ class TransaksiKm extends Model
     /**
      * Get preview transaction number for edit (excluding current record)
      */
-    public static function getPreviewNumberForEdit($jenisKas, $tanggal, $excludeIdx)
+    public static function getPreviewNumberForEdit(int|string $jenisKas, string $tanggal, int $excludeIdx)
     {
         $map = [
             1 => 'KGS',

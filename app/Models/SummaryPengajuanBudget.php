@@ -64,7 +64,7 @@ class SummaryPengajuanBudget extends Model
     /**
      * Get summary data from pengajuan_budget table
      */
-    public static function getSummaryData($tglDari, $tglSampai): array
+    public static function getSummaryData(?string $tglDari, ?string $tglSampai): array
     {
         $data = [
             'kgs' => 0,
@@ -73,9 +73,9 @@ class SummaryPengajuanBudget extends Model
             'bgs' => 0,
         ];
 
-        $results = \DB::table('pengajuan_budget as pb')
+        $results = \Illuminate\Support\Facades\DB::table('pengajuan_budget as pb')
             ->join('master_jenis_kas as mjk', 'pb.id_jenis_kas', '=', 'mjk.id_jenis_kas')
-            ->select('mjk.jenis_kas', \DB::raw('SUM(pb.nominal_pengajuan) as total_nominal'))
+            ->select('mjk.jenis_kas', \Illuminate\Support\Facades\DB::raw('SUM(pb.nominal_pengajuan) as total_nominal'))
             ->whereIn('pb.id_jenis_kas', ['1', '2', '3', '4'])
             ->where('pb.tgl_dari', '>=', $tglDari)
             ->where('pb.tgl_sampai', '<=', $tglSampai)

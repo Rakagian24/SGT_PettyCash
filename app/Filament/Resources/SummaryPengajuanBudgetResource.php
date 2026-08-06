@@ -37,7 +37,8 @@ class SummaryPengajuanBudgetResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        $user = auth()->user();
+        /** @var \App\Models\WebUser|null $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
         if (!$user) return false;
         
         if ($user->isSuperAdmin()) {
@@ -49,7 +50,8 @@ class SummaryPengajuanBudgetResource extends Resource
 
     public static function canAccess(): bool
     {
-        $user = auth()->user();
+        /** @var \App\Models\WebUser|null $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
         if (!$user) return false;
         
         if ($user->isSuperAdmin()) {
@@ -181,7 +183,7 @@ class SummaryPengajuanBudgetResource extends Resource
             ]);
     }
 
-    protected static function updateSummaryData($tglDari, $tglSampai, callable $set): void
+    protected static function updateSummaryData(?string $tglDari, ?string $tglSampai, callable $set): void
     {
         if ($tglDari && $tglSampai) {
             $summaryData = SummaryPengajuanBudget::getSummaryData($tglDari, $tglSampai);

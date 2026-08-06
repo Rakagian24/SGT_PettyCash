@@ -112,7 +112,7 @@ class WebUser extends Authenticatable implements FilamentUser
     /**
      * Check if user can access specific jenis kas
      */
-    public function canAccessJenisKas($jenisKasId): bool
+    public function canAccessJenisKas(int|string $jenisKasId): bool
     {
         // Super admin can access all jenis kas
         if ($this->isSuperAdmin()) {

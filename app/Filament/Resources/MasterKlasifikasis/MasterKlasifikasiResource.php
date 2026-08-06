@@ -57,7 +57,8 @@ class MasterKlasifikasiResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        $user = auth()->user();
+        /** @var \App\Models\WebUser|null $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
         if (!$user) return false;
         
         if ($user->isSuperAdmin()) {
@@ -69,7 +70,8 @@ class MasterKlasifikasiResource extends Resource
 
     public static function canAccess(): bool
     {
-        $user = auth()->user();
+        /** @var \App\Models\WebUser|null $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
         if (!$user) return false;
         
         if ($user->isSuperAdmin()) {

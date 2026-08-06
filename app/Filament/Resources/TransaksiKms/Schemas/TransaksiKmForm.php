@@ -48,7 +48,8 @@ class TransaksiKmForm
                 Select::make('id_jenis_kas')
                     ->label('Jenis Kas')
                     ->options(function () {
-                        $user = auth()->user();
+                        /** @var \App\Models\WebUser|null $user */
+                        $user = \Illuminate\Support\Facades\Auth::user();
                         $allOptions = [
                             1 => 'Kas Kecil (KGS)',
                             2 => 'Kas Operasional (OGS)',
@@ -197,7 +198,7 @@ class TransaksiKmForm
                     ->live()
                     ->afterStateHydrated(function ($state, callable $set) {
                         if ($state) {
-                            $klasifikasi = \App\Models\MasterKlasifikasi::find($state);
+                            $klasifikasi = MasterKlasifikasi::find($state);
                             if ($klasifikasi) {
                                 $set('_kriteria', $klasifikasi->kriteria);
                                 $set('_id_klasifikasi_display', $klasifikasi->id_klasifikasi);
@@ -206,7 +207,7 @@ class TransaksiKmForm
                     })
                     ->afterStateUpdated(function ($state, callable $set) {
                         if ($state) {
-                            $klasifikasi = \App\Models\MasterKlasifikasi::find($state);
+                            $klasifikasi = MasterKlasifikasi::find($state);
                             if ($klasifikasi) {
                                 $set('_kriteria', $klasifikasi->kriteria);
                                 $set('_id_klasifikasi_display', $klasifikasi->id_klasifikasi);
@@ -236,7 +237,7 @@ class TransaksiKmForm
 
                 TextInput::make('pembuat')
                     ->label('Pembuat')
-                    ->default(auth()->user()->name ?? auth()->user()->user_id)
+                    ->default(fn () => \Illuminate\Support\Facades\Auth::user() ? (\Illuminate\Support\Facades\Auth::user()->name ?? \Illuminate\Support\Facades\Auth::user()->user_id) : null)
                     ->disabled()
                     ->dehydrated(),
             ]);
