@@ -1,0 +1,29 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    # Menggunakan self-hosted runner
+    runs-on: self-hosted
+
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
+
+      - name: 📦 Install PHP Dependencies (Composer)
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --ignore-platform-reqs
+
+
+
+      - name: 🔄 Sync Files to Web Root
+        run: rsync -av --no-o --no-g --no-perms --exclude='.git' --exclude='.env' --exclude='node_modules' ./ /var/www/sgt_pettycash/ || true
+
+      - name: 🗄️ Run Migrations & Clear Cache
+        run: |
+          cd /var/www/sgt_pettycash
+          php artisan migrate --force
+          php artisan optimize:clear
